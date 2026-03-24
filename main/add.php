@@ -132,8 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <?php require_once(__DIR__ . "/components/userPanel.php"); ?>
-
     <script>
         // Keep your existing JavaScript functions exactly as they are
         function previewPhoto() {
