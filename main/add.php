@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $photo = "";
     
-    // Create photos directory if it doesn't exist (at project root)
     if (!is_dir("../photos")) {
         mkdir("../photos", 0755, true);
     }
@@ -20,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_FILES['photo']['name'])) {
         $photo = $id . "_" . basename($_FILES['photo']['name']);
         if (!move_uploaded_file($_FILES['photo']['tmp_name'], "../photos/" . $photo)) {
-            $photo = ""; // If upload fails, continue without photo
+            $photo = "";
         }
     }
     $file = fopen("../data/etudiants.csv", "a");
@@ -92,16 +91,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Photo de profil</label>
-                        <div class="relative group">
-                            <input type="file" name="photo" id="photoInput" class="hidden" accept="image/*" onchange="previewPhoto()">
-                            <label for="photoInput" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-8 cursor-pointer group-hover:border-blue-400 group-hover:bg-blue-50/30 transition-all">
-                                <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="relative">
+                            <input type="file" name="photo" id="photoInput" class="hidden" accept="image/*">
+                            <label 
+                                for="photoInput" 
+                                id="dropZone"
+                                class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-8 cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all"
+                            >
+                                <div id="dropIcon" class="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mb-3 transition-all duration-200">
+                                    <svg id="uploadSvg" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                 </div>
-                                <p class="text-sm font-bold text-slate-700">Cliquez pour importer</p>
-                                <p class="text-xs text-slate-400 mt-1">PNG, JPG jusqu'à 10MB</p>
+                                <p id="dropText" class="text-sm font-bold text-slate-700">Cliquez ou glissez une photo ici</p>
+                                <p id="dropSubtext" class="text-xs text-slate-400 mt-1">PNG, JPG jusqu'à 10MB</p>
                             </label>
                             <div id="photoPreview" class="mt-4 flex justify-center"></div>
                         </div>
@@ -133,28 +136,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        // Keep your existing JavaScript functions exactly as they are
-        function previewPhoto() {
-            const input = document.getElementById('photoInput');
-            const preview = document.getElementById('photoPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `
-                        <div class="relative inline-block group">
-                            <img src="${e.target.result}" class="w-24 h-24 object-cover rounded-2xl shadow-lg border-2 border-white ring-4 ring-blue-50">
-                            <button type="button" onclick="removePhoto()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:scale-110 transition-transform">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            </button>
-                        </div>
-                    `;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
+        const photoInput = document.getElementById('photoInput');
+        const dropZone  = document.getElementById('dropZone');
+        const dropIcon  = document.getElementById('dropIcon');
+        const dropText  = document.getElementById('dropText');
+        const dropSubtext = document.getElementById('dropSubtext');
+
+        // ── Click-to-upload ──────────────────────────────────────────────
+        photoInput.addEventListener('change', () => {
+            if (photoInput.files[0]) previewPhoto(photoInput.files[0]);
+        });
+
+        // ── Prevent browser from opening the file on the whole page ──────
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt =>
+            document.body.addEventListener(evt, e => e.preventDefault())
+        );
+
+        // ── Drag enter / over → highlight ────────────────────────────────
+        dropZone.addEventListener('dragenter', e => { e.preventDefault(); setDragActive(true); });
+        dropZone.addEventListener('dragover',  e => { e.preventDefault(); setDragActive(true); });
+
+        // ── Drag leave → only deactivate when truly leaving the zone ─────
+        dropZone.addEventListener('dragleave', e => {
+            if (!dropZone.contains(e.relatedTarget)) setDragActive(false);
+        });
+
+        // ── Drop ─────────────────────────────────────────────────────────
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            setDragActive(false);
+
+            const file = e.dataTransfer.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showError('Veuillez déposer une image (PNG, JPG…)'); return; }
+            if (file.size > 10 * 1024 * 1024)    { showError('La photo ne doit pas dépasser 10 MB.'); return; }
+
+            // Assign dropped file to the hidden input so it gets submitted
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            photoInput.files = dt.files;
+
+            previewPhoto(file);
+        });
+
+        // ── Helpers ───────────────────────────────────────────────────────
+        function setDragActive(on) {
+            dropZone.classList.toggle('border-blue-400', on);
+            dropZone.classList.toggle('bg-blue-50',      on);
+            dropZone.classList.toggle('border-slate-200', !on);
+            dropIcon.classList.toggle('scale-110',        on);
+            dropIcon.classList.toggle('bg-blue-100',      on);
+            dropIcon.classList.toggle('text-blue-500',    on);
+            dropIcon.classList.toggle('bg-slate-50',      !on);
+            dropIcon.classList.toggle('text-slate-400',   !on);
+            dropText.textContent = on ? 'Relâchez pour importer' : 'Cliquez ou glissez une photo ici';
+            dropText.classList.toggle('text-blue-600',    on);
+            dropText.classList.toggle('text-slate-700',   !on);
         }
+
+        function previewPhoto(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                dropText.textContent = file.name;
+                dropText.classList.remove('text-blue-600', 'text-red-500');
+                dropText.classList.add('text-slate-700');
+                dropSubtext.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+                document.getElementById('photoPreview').innerHTML = `
+                    <div class="relative inline-block">
+                        <img src="${e.target.result}" class="w-24 h-24 object-cover rounded-2xl shadow-lg border-2 border-white ring-4 ring-blue-50">
+                        <button type="button" onclick="removePhoto()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:scale-110 transition-transform">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>`;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function removePhoto() {
-            document.getElementById('photoInput').value = '';
+            photoInput.value = '';
             document.getElementById('photoPreview').innerHTML = '';
+            dropText.textContent = 'Cliquez ou glissez une photo ici';
+            dropText.classList.remove('text-blue-600', 'text-red-500');
+            dropText.classList.add('text-slate-700');
+            dropSubtext.textContent = "PNG, JPG jusqu'à 10MB";
+            dropIcon.classList.remove('scale-110', 'bg-blue-100', 'text-blue-500');
+            dropIcon.classList.add('bg-slate-50', 'text-slate-400');
+        }
+
+        function showError(msg) {
+            dropText.textContent = msg;
+            dropText.classList.add('text-red-500');
+            dropText.classList.remove('text-slate-700', 'text-blue-600');
+            setTimeout(() => {
+                dropText.textContent = 'Cliquez ou glissez une photo ici';
+                dropText.classList.remove('text-red-500');
+                dropText.classList.add('text-slate-700');
+            }, 3000);
         }
     </script>
 </body>
