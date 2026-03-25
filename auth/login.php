@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         while (($data = fgetcsv($handle)) !== false) {
             if ($data[0] === $username && password_verify($password, trim($data[1]))) {
                 $_SESSION['user'] = $username;
+                $_SESSION['role'] = $data[2];
                 fclose($handle);
                 header("Location: ../main/dashboard.php");
                 exit;

@@ -5,6 +5,11 @@ if (!isset($_SESSION['user'])) {
     exit; 
 }
 
+if(isset($_SESSION['role']) && $_SESSION['role'] != "admin") {
+    header("Location: ../index.php");
+    exit();
+}
+
 $message = "";
 $usersPath = "../data/users.csv";
 

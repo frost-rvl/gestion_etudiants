@@ -93,27 +93,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container mx-auto px-4 py-8 relative z-10">
         
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <a href="add.php" class="bg-slate-900 text-white px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 shadow-lg transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Ajouter
-            </a>
-            
-            <a href="dashboard.php?export=csv" class="bg-white text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 shadow-sm transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Exporter
-            </a>
+        <?php if(isset($_SESSION['role']) && $_SESSION['role'] == "admin") { ?>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <a href="add.php" class="bg-slate-900 text-white px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 shadow-lg transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Ajouter
+                </a>
+                
+                <a href="dashboard.php?export=csv" class="bg-white text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 shadow-sm transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Exporter
+                </a>
 
-            <button onclick="toggleModal('importModal', true)" class="bg-white text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 shadow-sm transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                Importer
-            </button>
+                <button onclick="toggleModal('importModal', true)" class="bg-white text-slate-700 border border-slate-200 px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 shadow-sm transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    Importer
+                </button>
 
-            <button type="submit" form="deleteForm" class="bg-red-50 text-red-600 border border-red-100 px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-100 shadow-sm transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                Supprimer
-            </button>
-        </div>
+                <button type="submit" form="deleteForm" class="bg-red-50 text-red-600 border border-red-100 px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-100 shadow-sm transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Supprimer
+                </button>
+            </div>
+        <?php }; ?>
 
         <?php if ($message): ?>
             <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 p-4 rounded-xl mb-6 font-bold animate-slideUp">
