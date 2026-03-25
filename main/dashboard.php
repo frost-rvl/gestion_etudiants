@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $rows[] = $data;
                     } else {
                         $photo = $data[5] ?? '';
-                        if ($photo && $photo !== 'default.png' && file_exists("../photos/" . $photo)) {
+                        if ($photo && $photo !== 'default.jpg' && file_exists("../photos/" . $photo)) {
                             unlink("../photos/" . $photo);
                         }
                     }
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php
                             if (file_exists($csvPath) && ($file = fopen($csvPath, "r")) !== false) {
                                 while (($data = fgetcsv($file)) !== false) {
-                                    $id = $data[0]; $nom = $data[1]; $prenom = $data[2]; $tel = $data[3]; $email = $data[4]; $photo = (!empty($data[5])) ? $data[5] : 'default.png';
+                                    $id = $data[0]; $nom = $data[1]; $prenom = $data[2]; $tel = $data[3]; $email = $data[4]; $photo = (!empty($data[5])) ? $data[5] : 'default.jpg';
                                     ?>
                                     <tr class="hover:bg-slate-50/80 transition-colors">
                                         <?php if(isset($_SESSION['role']) && $_SESSION['role'] == "admin") { ?>

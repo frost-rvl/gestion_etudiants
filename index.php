@@ -8,9 +8,10 @@ $usersPath = "./data/users.csv";
 if(!file_exists($usersPath) || !file_exists($csvPath)) {
   $userFile = fopen($usersPath, "w");
   $csvFile = fopen($csvPath, "w");
+  $env = parse_ini_file('.env');
   $default_admin = [
     "admin",
-     password_hash("admin", PASSWORD_DEFAULT),
+     password_hash($env["ADMIN_PASSWORD"], PASSWORD_DEFAULT),
     "admin"
   ];
   fputcsv($userFile, $default_admin);
