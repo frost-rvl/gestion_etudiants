@@ -163,7 +163,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="p-4"><input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-slate-300 text-blue-600"></th>
+                                <?php if(isset($_SESSION['role']) && $_SESSION['role'] == "admin") { ?>
+                                    <th class="p-4"><input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-slate-300 text-blue-600"></th>
+                                <?php }; ?>
                                 <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Etudiant</th>
                                 <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Contact</th>
                                 <th class="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Actions</th>
@@ -176,7 +178,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     $id = $data[0]; $nom = $data[1]; $prenom = $data[2]; $tel = $data[3]; $email = $data[4]; $photo = (!empty($data[5])) ? $data[5] : 'default.png';
                                     ?>
                                     <tr class="hover:bg-slate-50/80 transition-colors">
-                                        <td class="p-4"><input type="checkbox" name="selected[]" value="<?= $id ?>" class="w-4 h-4 rounded border-slate-300"></td>
+                                        <?php if(isset($_SESSION['role']) && $_SESSION['role'] == "admin") { ?>
+                                            <td class="p-4"><input type="checkbox" name="selected[]" value="<?= $id ?>" class="w-4 h-4 rounded border-slate-300"></td>
+                                        <?php }; ?>
                                         <td class="p-4">
                                             <div class="flex items-center gap-3">
                                                 <img src="../photos/<?= htmlspecialchars($photo) ?>" class="w-10 h-10 rounded-full object-cover border border-slate-200">
