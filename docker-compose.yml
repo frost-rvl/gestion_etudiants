@@ -13,14 +13,3 @@ services:
         apache2-foreground
       "
 
-  # db:
-  #   image: mariadb:11
-  #   container_name: mariadb
-  #   env_file:
-  #     - path: ./.env
-  #       required: true
-  #   ports:
-  #     - "3306:3306"
-  #   volumes:
-  #     - ./data:/var/lib/mysql
-
