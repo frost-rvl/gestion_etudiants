@@ -167,8 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <?php require_once(__DIR__ . "/components/userPanel.php"); ?>
-
     <script>
         const dropzone = document.getElementById('dropzone');
         const photoInput = document.getElementById('photoInput');

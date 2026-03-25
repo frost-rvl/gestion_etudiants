@@ -7,11 +7,10 @@ if (isset($_SESSION['user'])) {
 $error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $password = trim($_POST['password']) ?? '';
     if (($handle = fopen("../data/users.csv", "r")) !== false) {
-        fgetcsv($handle); // Ignorer l'en-tête
         while (($data = fgetcsv($handle)) !== false) {
-            if ($data[0] === $username && password_verify($password, $data[1])) {
+            if ($data[0] === $username && password_verify($password, trim($data[1]))) {
                 $_SESSION['user'] = $username;
                 fclose($handle);
                 header("Location: ../main/dashboard.php");
