@@ -79,9 +79,3 @@ id,nom,prenom,telephone,email,photo
 - Stockage : fichiers CSV
 - Frontend : Tailwind CSS
 - Conteneur : Docker / Apache
-
-## Limitations
-
-- Non adapté à un volume important de données
-- Pas de protection CSRF sur les formulaires
-- Validation du type MIME des uploads à renforcer
