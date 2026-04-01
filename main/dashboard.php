@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Utilisateur supprime";
     }
 
+    // Importer
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
         $csvTmp = $_FILES['csv_file']['tmp_name'];
         $rows = [];
